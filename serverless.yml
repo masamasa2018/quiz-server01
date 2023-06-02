@@ -1,0 +1,107 @@
+
+service: quiz-server
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.9
+  stage: beta
+  region: ap-northeast-1
+  httpApi:
+    cors: true
+
+  iamRoleStatements:
+    - Effect: Allow
+
+      Action:
+        - dynamodb:*
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/*
+
+functions:
+  postQuiz:
+    handler: quiz.post_quiz
+    events:
+      - httpApi:
+          path: /quiz
+          method: post
+  getQuiz:
+    handler: quiz.get_quiz
+    events:
+      - httpApi:
+          path: /quiz/{id}
+          method: get
+  getAllQuiz:
+    handler: quiz.get_all_quiz
+    events:
+      - httpApi:
+          path: /quiz
+          method: get
+  putQuiz:
+    handler: quiz.put_quiz
+    events:
+      - httpApi:
+          path: /quiz/{id}
+          method: put
+  deleteQuiz:
+    handler: quiz.delete_quiz
+    events:
+      - httpApi:
+          path: /quiz/{id}
+          method: delete
+  postAccess:
+    handler: access.post_access
+    events:
+      - httpApi:
+          path: /access
+          method: post
+  postInquery:
+    handler: inquery.post_inquery
+    events:
+      - httpApi:
+          path: /inquery
+          method: post
+plugins:
+  # 他のプラグイン
+  - serverless-offline
+
+resources:
+ Resources:
+   quizTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: QuizTable
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1 
+   accessHistTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: AccessHistTable
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1 
+   inqueryHistTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: InqueryHistTable
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1 
