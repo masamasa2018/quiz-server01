@@ -4,14 +4,20 @@ import string
 import boto3
 import datetime
 from decimal import Decimal
+import os
 
 dynamodb = boto3.resource("dynamodb")
-table = dynamodb.Table("QuizTable")
+stage = os.environ.get("stage")
+if stage == "beta" :
+    table = dynamodb.Table("QuizTable_beta")
+else:
+    table = dynamodb.Table("QuizTable")
 
 def post_quiz(event, context):
     body = json.loads(event.get("body"))
-    code = body.get("code")
     category = body.get("category")
+    code = body.get("code")
+
     question = body.get("question")
     answers = body.get("answers")
     correct_code = body.get("correct_code")
@@ -30,12 +36,8 @@ def post_quiz(event, context):
            }
     table.put_item(Item = item)
     response = {"statusCode": 200 ,
-            #    'headers': {
-            #    "Access-Control-Allow-Origin": "*",
-            #    "Access-Control-Allow-Methods": "POST,GET,PUT,DELETE",
-            #    "Access-Control-Allow-Headers": "Content-Type"
-            #    },
-               "body": json.dumps(item)
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": '*'
                }
     return response
 
@@ -48,11 +50,10 @@ def decimal_default(obj):
     raise TypeError
 
 def get_all_quiz(event, context):
-    # body = json.loads(event.get("body"))
+
     response = table.scan()
     items = response.get("Items")
 
-    #response = {"statusCode": 200, "body": json.dumps(items)}
     response = {"statusCode": 200, "body": json.dumps(items, default=decimal_default)}
     return response
 
@@ -61,7 +62,6 @@ def get_quiz(event, context):
     res = table.get_item(Key={"id": id})
     
     item = res.get("Item")
-    #response = {"statusCode": 200, "body": json.dumps(item)}
     response = {"statusCode": 200, "body": json.dumps(item)}
     return response
 
@@ -84,8 +84,8 @@ def put_quiz(event, context):
     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     item = {
-           "code": code ,
            "category": category,
+           "code": code ,
            "question": question,
            "answers": answers,
            "correct_code": correct_code,

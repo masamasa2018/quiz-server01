@@ -4,9 +4,14 @@ import string
 import boto3
 import datetime
 from decimal import Decimal
+import os
 
 dynamodb = boto3.resource("dynamodb")
-table = dynamodb.Table("InqueryHistTable")
+stage = os.environ.get("stage")
+if stage == "beta" :
+    table = dynamodb.Table("InqueryHistTable_beta")
+else:
+    table = dynamodb.Table("InqueryHistTable")
 
 def post_inquery(event, context):
     body = json.loads(event.get("body"))

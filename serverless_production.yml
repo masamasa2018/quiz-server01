@@ -5,13 +5,14 @@ frameworkVersion: '3'
 provider:
   name: aws
   runtime: python3.9
-  stage: beta
+  stage: production
   region: ap-northeast-1
   httpApi:
     cors: true
 
   iamRoleStatements:
     - Effect: Allow
+
       Action:
         - dynamodb:*
       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/*
@@ -20,7 +21,7 @@ functions:
   postQuiz:
     handler: quiz.post_quiz
     environment:
-      stage: beta
+      ENV: prodution
     events:
       - httpApi:
           path: /quiz
@@ -28,7 +29,7 @@ functions:
   getQuiz:
     handler: quiz.get_quiz
     environment:
-      stage: beta
+      ENV: prodution
     events:
       - httpApi:
           path: /quiz/{id}
@@ -36,7 +37,7 @@ functions:
   getAllQuiz:
     handler: quiz.get_all_quiz
     environment:
-      stage: beta
+      ENV: prodution
     events:
       - httpApi:
           path: /quiz
@@ -44,7 +45,7 @@ functions:
   putQuiz:
     handler: quiz.put_quiz
     environment:
-      stage: beta
+      ENV: prodution
     events:
       - httpApi:
           path: /quiz/{id}
@@ -52,7 +53,7 @@ functions:
   deleteQuiz:
     handler: quiz.delete_quiz
     environment:
-      stage: beta
+      ENV: prodution
     events:
       - httpApi:
           path: /quiz/{id}
@@ -60,7 +61,7 @@ functions:
   postAccess:
     handler: access.post_access
     environment:
-      stage: beta
+      ENV: prodution
     events:
       - httpApi:
           path: /access
@@ -68,7 +69,7 @@ functions:
   postInquery:
     handler: inquery.post_inquery
     environment:
-      stage: beta
+      ENV: prodution
     events:
       - httpApi:
           path: /inquery
@@ -76,7 +77,7 @@ functions:
   postQuizLike:
     handler: quizLike.post_like
     environment:
-      stage: beta
+      stage: prodution
     events:
       - httpApi:
           path: /quizLike
@@ -84,7 +85,7 @@ functions:
   deleteQuizLike:
     handler: quizLike.delete_like
     environment:
-      stage: beta
+      stage: prodution
     events:
       - httpApi:
           path: /quizLike
@@ -92,7 +93,7 @@ functions:
   getQuizLike:
     handler: quizLike.get_like
     environment:
-      stage: beta
+      stage: prodution
     events:
       - httpApi:
           path: /quizLike/{category}/{code}
@@ -100,16 +101,15 @@ functions:
   getQuizLikeCount:
     handler: quizLike.get_like_count
     environment:
-      stage: beta
+      stage: prodution
     events:
       - httpApi:
           path: /quizLikeCount/{category}/{code}
           method: get
-
   getQuizLikeByUidCount:
     handler: quizLike.get_like_count_by_uid
     environment:
-      stage: beta
+      stage: prodution
     events:
       - httpApi:
           path: /quizLikeCountByUid/{category}/{code}/{uid}
@@ -125,7 +125,7 @@ resources:
    quizTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: QuizTable_beta
+        TableName: QuizTable
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
@@ -138,7 +138,7 @@ resources:
    quizLike:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: QuizLike_beta
+        TableName: QuizLike
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
@@ -151,7 +151,7 @@ resources:
    accessHistTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: AccessHistTable_beta
+        TableName: AccessHistTable
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
@@ -164,7 +164,7 @@ resources:
    inqueryHistTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: InqueryHistTable_beta
+        TableName: InqueryHistTable
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S

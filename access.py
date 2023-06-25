@@ -4,15 +4,20 @@ import string
 import boto3
 import datetime
 from decimal import Decimal
+import os
 
 dynamodb = boto3.resource("dynamodb")
-table = dynamodb.Table("AccessHistTable")
+stage = os.environ.get("stage")
+if stage == "beta" :
+    table = dynamodb.Table("AccessHistTable_beta")
+else:
+    table = dynamodb.Table("AccessHistTable")
 
 def post_access(event, context):
     body = json.loads(event.get("body"))
     uri = body.get("uri")
     host = body.get("host")
-    uuid = body.get("uuid")
+    uid = body.get("uid")
 
     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -20,7 +25,7 @@ def post_access(event, context):
     item = {"id": id,
            "uri": uri ,
            "host": host,
-           "uuid": uuid,
+           "uid": uid,
            "created_at": now,
            }
     table.put_item(Item = item)
